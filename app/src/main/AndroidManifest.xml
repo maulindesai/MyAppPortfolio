@@ -14,9 +14,13 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.maulin.popularmovies.MainActivity"
+            android:label="@string/app_name_p1"
+            />
     </application>
 
 </manifest>

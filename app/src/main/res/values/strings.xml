@@ -9,4 +9,9 @@
     <string name="ant_terminator">Build It Bigger</string>
     <string name="materialize">XYZ Reader</string>
     <string name="capstone">Capstone</string>
+    <string name="app_name_p1">Popular Movies</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="content_descr_movie_poster">Movie Poster ImageView</string>
 </resources>
