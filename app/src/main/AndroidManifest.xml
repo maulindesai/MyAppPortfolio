@@ -24,7 +24,12 @@
         <activity
             android:name="com.maulin.popularmovies.MainActivity"
             android:label="@string/app_name_p1"
+            android:parentActivityName="com.example.maulin.myappportfolio.HomeScreenActivity"
             android:theme="@style/AppTheme.NoActionBar">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.maulin.myappportfolio.HomeScreenActivity" />
         </activity>
         <activity
             android:name="com.maulin.popularmovies.DetailActivity"
