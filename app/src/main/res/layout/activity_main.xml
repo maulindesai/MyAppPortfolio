@@ -4,7 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.maulin.popularmovies.MainActivity">
+
+    <include layout="@layout/app_toolbar"/>
+
     <fragment
+        android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:name="com.maulin.popularmovies.fragment.MovieListFragment"

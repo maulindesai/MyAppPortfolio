@@ -6,18 +6,8 @@
 
     <ImageView
         android:id="@+id/iv_movie_poster"
-        android:layout_width="@dimen/movie_list_column_width"
-        android:layout_height="@dimen/movie_list_column_width"
+        android:adjustViewBounds="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:contentDescription="@string/content_descr_movie_poster" />
-
-    <!--<TextView-->
-    <!--android:padding="10dp"-->
-    <!--android:text="dkfjgf"-->
-    <!--android:gravity="center"-->
-    <!--android:layout_gravity="left|top"-->
-    <!--android:textSize="?android:textAppearanceMedium"-->
-    <!--android:textColor="@android:color/white"-->
-    <!--android:background="@android:color/darker_gray"-->
-    <!--android:layout_width="@dimen/movie_list_column_width"-->
-    <!--android:layout_height="wrap_content" />-->
 </FrameLayout>
