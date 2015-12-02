@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.maulin.myappportfolio.R;
 import com.maulin.popularmovies.Constants;
@@ -46,6 +48,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
     private GridView mMovieListGridView;
     private MovieListAdapter mMovieListAdapter;
     private String mSort_order="";
+    private ProgressBar mProgressBar;
 
     public MovieListFragment() {
         // Required empty public constructor
@@ -62,6 +65,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_movie_list, container, false);
         mMovieListGridView= (GridView) view.findViewById(R.id.movieList_grid);
+        mProgressBar=(ProgressBar) view.findViewById(R.id.progressBar);
         return view;
     }
 
@@ -112,6 +116,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
      * @param sort_order movie sort order
      */
     private void fetchTmdbMovies(String sort_order) {
+        mProgressBar.setVisibility(View.VISIBLE);
         //start download movie poster
         FetchData fetchData = new FetchData();
         if(sort_order.equals("most_popular"))
@@ -180,6 +185,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
                     return null;
                 }
             } else {
+                Toast.makeText(getActivity(), R.string.network_error_msg,Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -193,6 +199,8 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
             } else {
                 Log.d(TAG,"no movie list found");
             }
+            if(mProgressBar!=null)
+                mProgressBar.setVisibility(View.GONE);
         }
     }
 

@@ -56,4 +56,12 @@
         <item name="android:layout_height">1dp</item>
         <item name="android:background">#7c7979</item>
     </style>
+
+    <!-- progress bar style -->
+    <style name="ProgressBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:indeterminate">true</item>
+    </style>
 </resources>
