@@ -7,9 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.maulin.myappportfolio.R;
 import com.maulin.popularmovies.model.Movies;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,10 +20,12 @@ import java.util.List;
 public class MovieListAdapter extends ArrayAdapter<Movies> {
 
     private final LayoutInflater inflater;
+    private final List<Movies> mArrayListMovies;
 
     //movies list adapter constructor
     public MovieListAdapter(Context context,List<Movies> objects) {
         super(context, 0, objects);
+        mArrayListMovies=objects;
         inflater=LayoutInflater.from(context);
     }
 
@@ -37,7 +41,25 @@ public class MovieListAdapter extends ArrayAdapter<Movies> {
            holder= (ViewHolder) convertView.getTag();
        }
 
+        //movie poster url
+        String movie_poster_url=getItem(position).getPoster_path();
+
+        //glide download image
+        Glide.with(getContext())
+                .load(movie_poster_url)
+                .placeholder(android.R.drawable.stat_sys_download)
+                .crossFade()
+                .into(holder.moviePosterView);
+
         return convertView;
+    }
+
+    /**
+     * return collection of arrayList values
+     * @return
+     */
+    public ArrayList<Movies> getValues(){
+        return (ArrayList<Movies>) mArrayListMovies;
     }
 
     /**

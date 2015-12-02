@@ -17,13 +17,13 @@
     <Button
         android:layout_below="@id/my_app_title"
         style="@style/AppButton"
-        android:id="@+id/button1"
+        android:id="@+id/popularMovies"
         android:text="@string/media_streamer"
         android:onClick="onClickButton1"
         />
     <Button
         android:id="@+id/button2"
-        android:layout_below="@id/button1"
+        android:layout_below="@id/popularMovies"
         style="@style/AppButton"
         android:text="@string/super_duo1"
         android:onClick="onClickButton2"

@@ -8,9 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:numColumns="auto_fit"
-        android:columnWidth="@dimen/movie_list_column_width"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:gravity="center"
         android:stretchMode="columnWidth"
         android:id="@+id/movieList_grid"
         />

@@ -1,5 +1,6 @@
 package com.example.maulin.myappportfolio;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
+
+import com.maulin.popularmovies.MainActivity;
 
 public class HomeScreenActivity extends AppCompatActivity {
 
@@ -19,7 +22,9 @@ public class HomeScreenActivity extends AppCompatActivity {
     }
 
     public void onClickButton1(View view) {
-        Toast.makeText(this,R.string.media_streamer,Toast.LENGTH_SHORT).show();
+        //call my first achievement :-)
+        Intent popularMovies =new Intent(this, MainActivity.class);
+        startActivity(popularMovies);
     }
 
     public void onClickButton2(View view) {
