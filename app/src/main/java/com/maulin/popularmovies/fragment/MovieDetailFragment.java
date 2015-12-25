@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -164,11 +166,13 @@ public class MovieDetailFragment extends Fragment implements MovieDetailAdapter.
 
         private final View footer_view;
         private final TextView tv_network_error;
+        private final ProgressBar progresBar;
 
         public DownloadMovieDetail(Context context, Movies movies) {
             super(context,movies);
             LayoutInflater inflater=LayoutInflater.from(context);
             footer_view=inflater.inflate(R.layout.footer_loader_view,null);
+            progresBar=(ProgressBar) footer_view.findViewById(R.id.progressBar);
             tv_network_error=(TextView) footer_view.findViewById(R.id.tv_network_error);
         }
 
@@ -183,6 +187,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailAdapter.
             super.onPostExecute(movieDetail);
             if(isVisible()) {
                 if (movieDetail == null) {
+                    progresBar.setVisibility(View.INVISIBLE);
                     tv_network_error.setVisibility(View.VISIBLE);
                     Toast.makeText(getActivity(), R.string.network_error_msg, Toast.LENGTH_SHORT).show();
                 } else {

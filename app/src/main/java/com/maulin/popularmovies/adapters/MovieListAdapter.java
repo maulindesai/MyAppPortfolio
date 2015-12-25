@@ -48,7 +48,7 @@ public class MovieListAdapter extends ArrayAdapter<Movies> {
         Glide.with(getContext())
                 .load(movie_poster_url)
                 .placeholder(android.R.drawable.stat_sys_download)
-                .error(android.R.drawable.ic_dialog_alert)
+                .error(android.R.color.holo_red_light)
                 .crossFade()
                 .into(holder.moviePosterView);
 

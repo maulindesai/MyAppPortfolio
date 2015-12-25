@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 
+import com.maulin.popularmovies.database.FavouriteMovieDetail;
 import com.maulin.popularmovies.database.MovieReview;
 import com.maulin.popularmovies.database.MovieTrailer;
 import com.maulin.popularmovies.database.MoviesProvider;
@@ -135,6 +137,25 @@ public class StoreFavoriteMovieIntentService extends IntentService {
             contentValues.put(MOVIE_RELEASE_DATE, movie.getRelease_date());
             operations.add(ContentProviderOperation.newInsert(MoviesProvider.FavouriteMovieDetail.CONTENT_URI)
                     .withValues(contentValues).build());
+        } else {
+            /**
+             * is user in favorite section
+             * and remove movie and add it back in favourite section
+             * then
+             * it should be reflect so
+             * add in to db cache again
+             */
+            if(!checkIsMovieFavorite(movie.getId())) {
+                contentValues = new ContentValues();
+                contentValues.put(MOVIE_ID, movie.getId());
+                contentValues.put(MOVIE_OVERVIEW, movie.getOverview());
+                contentValues.put(MOVIE_TITLE, movie.getTitle());
+                contentValues.put(POSTER_PATH, movie.getPoster_path());
+                contentValues.put(MOVIE_VOTE_AVERAGE, movie.vote_average);
+                contentValues.put(MOVIE_RELEASE_DATE, movie.getRelease_date());
+                operations.add(ContentProviderOperation.newInsert(MoviesProvider.FavouriteMovieDetail.CONTENT_URI)
+                        .withValues(contentValues).build());
+            }
         }
         //add movie trailer
         for(com.maulin.popularmovies.model.MovieTrailer trailer:movieDetail.getMovieTrailers()) {
@@ -160,5 +181,17 @@ public class StoreFavoriteMovieIntentService extends IntentService {
         }
 
         getContentResolver().applyBatch(AUTHORITY,operations);
+    }
+
+    public boolean checkIsMovieFavorite(String movieID) {
+        Cursor cursor = getContentResolver().query(MoviesProvider.FavouriteMovieDetail.withId(movieID), new String[]{
+                FavouriteMovieDetail.MOVIE_ID
+        }, null, null, null);
+        boolean result=false;
+        if (cursor != null) {
+            result=cursor.moveToFirst();
+            cursor.close();
+        }
+        return result;
     }
 }

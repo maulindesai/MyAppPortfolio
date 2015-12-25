@@ -56,7 +56,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
     private MovieListAdapter mMovieListAdapter;
     private String mSort_order="";
     private ProgressBar mProgressBar;
-    private int mSelectedMoviePosition=0;
+    private int mSelectedMoviePosition=-1;
     private utility mUtility;
 
     public MovieListFragment() {
@@ -90,7 +90,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         if(savedInstanceState!=null) {
             ArrayList<Movies> moviesArrayList=savedInstanceState.getParcelableArrayList(KEY_MOVIE_LIST);
             //restore previous user selected position
-            mSelectedMoviePosition=savedInstanceState.getInt(KEY_SELECTED_MOVIE_POSITION,0);
+            mSelectedMoviePosition=savedInstanceState.getInt(KEY_SELECTED_MOVIE_POSITION,-1);
 
             //restore sort order
             mSort_order=savedInstanceState.getString(KEY_SORT_ORDER,"most_popular");
@@ -98,7 +98,10 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
             mMovieListGridView.setAdapter(mMovieListAdapter);
 
             //restore to selected item
-            if(((MainActivity)getActivity()).isTabletMode)
+            if(((MainActivity)getActivity()).isTabletMode &&
+                    mMovieListAdapter.getCount()!=0
+                    && mSelectedMoviePosition!=-1
+                    )
                 mMovieListGridView.performItemClick(mMovieListAdapter.getView(0,null,null),
                         mSelectedMoviePosition,0);
 
@@ -266,17 +269,19 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         @Override
         protected void onPostExecute(ArrayList<Movies> movieList) {
             super.onPostExecute(movieList);
-            if(movieList!=null) {
-                //add and notify adapter s
-                mMovieListAdapter.addAll(movieList);
-                //display coach mark in tablet mode
+            if (isVisible()) {
+                if (movieList != null) {
+                    //add and notify adapter s
+                    mMovieListAdapter.addAll(movieList);
+                    //display coach mark in tablet mode
 
-            } else {
-                Toast.makeText(getActivity(), R.string.network_error_msg,Toast.LENGTH_SHORT).show();
-                Log.d(TAG,"no movie list found");
+                } else {
+                    Toast.makeText(getActivity(), R.string.network_error_msg, Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "no movie list found");
+                }
+                if (mProgressBar != null)
+                    mProgressBar.setVisibility(View.GONE);
             }
-            if(mProgressBar!=null)
-                mProgressBar.setVisibility(View.GONE);
         }
     }
 
