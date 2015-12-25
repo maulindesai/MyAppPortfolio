@@ -12,7 +12,7 @@ public class Constants {
     /**
      * API KEY for tmdb
      */
-    public static String API_KEY="PLACE YOUR KEY HERE";
+    public static String API_KEY="PLACE YOUR API KEY HERE";
 
     //TMDB movie url
     public static String TMDB_URL="http://api.themoviedb.org/3";
