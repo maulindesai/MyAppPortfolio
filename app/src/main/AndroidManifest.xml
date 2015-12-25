@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name="com.MyAppPortfolioApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,34 +23,47 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.maulin.popularmovies.MainActivity"
+            android:name="com.maulin.popularmovies.ui.MainActivity"
             android:label="@string/app_name_p1"
-            android:parentActivityName="com.example.maulin.myappportfolio.HomeScreenActivity"
+            android:parentActivityName=".HomeScreenActivity"
             android:theme="@style/AppTheme.NoActionBar">
+
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.maulin.myappportfolio.HomeScreenActivity" />
         </activity>
         <activity
-            android:name="com.maulin.popularmovies.DetailActivity"
+            android:name="com.maulin.popularmovies.ui.DetailActivity"
             android:label="@string/titleMovieDetail"
-            android:parentActivityName="com.maulin.popularmovies.MainActivity"
+            android:parentActivityName="com.maulin.popularmovies.ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
+
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.maulin.popularmovies.MainActivity" />
+                android:value="com.maulin.popularmovies.ui.MainActivity" />
         </activity>
         <activity
-            android:name="com.maulin.popularmovies.SettingsActivity"
+            android:name="com.maulin.popularmovies.ui.SettingsActivity"
             android:label="@string/settings"
-            android:parentActivityName="com.maulin.popularmovies.MainActivity">
+            android:parentActivityName="com.maulin.popularmovies.ui.MainActivity">
+
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.maulin.popularmovies.MainActivity" />
+                android:value="com.maulin.popularmovies.ui.MainActivity" />
         </activity>
+
+        <provider
+            android:name="com.maulin.popularmovies.provider.MoviesProvider"
+            android:authorities="com.maulin.popularmovies.MoviesProvider"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name="com.maulin.popularmovies.ui.StoreFavoriteMovieIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>

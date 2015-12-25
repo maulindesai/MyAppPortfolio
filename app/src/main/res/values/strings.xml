@@ -19,4 +19,11 @@
     <string name="settings">Settings</string>
     <string name="titleMovieDetail">Movie Detail</string>
     <string name="network_error_msg">Network Error Please Retry Later...</string>
+    <string name="imagethumbnail_for_movie_trailer">ImageThumbnail for movie Trailer</string>
+    <string name="trailer">TRAILERS</string>
+    <string name="review">REVIEWS</string>
+    <string name="favorite">Mark As %1$S</string>
+    <string name="select_movie_list_coach_mark">Select Movie List</string>
+    <string name="share_trailer">ShareTrailer</string>
+    <string name="no_application_found">No Application Found For Sharing Trailer</string>
 </resources>

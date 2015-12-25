@@ -9,15 +9,17 @@ import com.maulin.popularmovies.Constants;
  * Created by maulin on 23/11/15.
  */
 public class Movies  implements Parcelable {
+    String id;
     String poster_path;
     String overview;
     String title;
-    String vote_average;
+    public String vote_average;
     String release_date;
 
     public Movies(){}
 
     protected Movies(Parcel in) {
+        id=in.readString();
         poster_path = in.readString();
         overview = in.readString();
         title = in.readString();
@@ -41,6 +43,14 @@ public class Movies  implements Parcelable {
         //get poster path with attached url
         //TODO w185 might be change in tablets ?
         return Constants.TMDB_IMAGE_URL+"/w185/"+poster_path;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setPoster_path(String poster_path) {
@@ -79,6 +89,7 @@ public class Movies  implements Parcelable {
         this.release_date = release_date;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -86,6 +97,7 @@ public class Movies  implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(poster_path);
         dest.writeString(overview);
         dest.writeString(title);

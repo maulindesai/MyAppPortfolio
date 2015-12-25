@@ -3,9 +3,14 @@ package com.maulin.popularmovies.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,18 +23,16 @@ import android.widget.Toast;
 import com.example.maulin.myappportfolio.R;
 import com.maulin.popularmovies.Constants;
 import com.maulin.popularmovies.adapters.MovieListAdapter;
+import com.maulin.popularmovies.database.FavouriteMovieDetail;
+import com.maulin.popularmovies.database.MoviesProvider;
 import com.maulin.popularmovies.model.Movies;
+import com.maulin.popularmovies.ui.MainActivity;
+import com.maulin.popularmovies.utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -39,16 +42,22 @@ import java.util.ArrayList;
  * to handle interaction events.
  *
  */
-public class MovieListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class MovieListFragment extends Fragment implements AdapterView.OnItemClickListener,
+            LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = "MovieListFragment";
     private static final String KEY_MOVIE_LIST = "MovieList";
     private static final String KEY_SORT_ORDER = "movie_sort_order";
+    private static final String KEY_SELECTED_MOVIE_POSITION = "key_selected_movie_position";
+    private static final String KEY_GRIDVIEW_SCROLL_POSITION = "key_gridview_scrollposition";
+    private static final int FAVOURITE_LOADER_ID = 0;
     private OnMovieItemClickListener mListener;
     private GridView mMovieListGridView;
     private MovieListAdapter mMovieListAdapter;
     private String mSort_order="";
     private ProgressBar mProgressBar;
+    private int mSelectedMoviePosition=0;
+    private utility mUtility;
 
     public MovieListFragment() {
         // Required empty public constructor
@@ -72,15 +81,29 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //get utility
+        mUtility=utility.getUtility();
+
         //set item click listener
         mMovieListGridView.setOnItemClickListener(this);
 
         if(savedInstanceState!=null) {
             ArrayList<Movies> moviesArrayList=savedInstanceState.getParcelableArrayList(KEY_MOVIE_LIST);
+            //restore previous user selected position
+            mSelectedMoviePosition=savedInstanceState.getInt(KEY_SELECTED_MOVIE_POSITION,0);
+
             //restore sort order
             mSort_order=savedInstanceState.getString(KEY_SORT_ORDER,"most_popular");
             mMovieListAdapter=new MovieListAdapter(getActivity(),moviesArrayList);
             mMovieListGridView.setAdapter(mMovieListAdapter);
+
+            //restore to selected item
+            if(((MainActivity)getActivity()).isTabletMode)
+                mMovieListGridView.performItemClick(mMovieListAdapter.getView(0,null,null),
+                        mSelectedMoviePosition,0);
+
+            //smooth scroll grid view
+            mMovieListGridView.smoothScrollToPosition(savedInstanceState.getInt(KEY_SELECTED_MOVIE_POSITION,0));
         }
     }
 
@@ -94,7 +117,6 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
             //create adapter
             mMovieListAdapter=new MovieListAdapter(getActivity(),new ArrayList<Movies>());
             mMovieListGridView.setAdapter(mMovieListAdapter);
-            
             fetchTmdbMovies(mSort_order);
         } else {
             //check if there is change in user movie sort order
@@ -119,10 +141,18 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         mProgressBar.setVisibility(View.VISIBLE);
         //start download movie poster
         FetchData fetchData = new FetchData();
-        if(sort_order.equals("most_popular"))
-            fetchData.execute(Constants.TMDB_DISCOVER_MOVIE+"&sort_by=popularity.desc");
-        else
-            fetchData.execute(Constants.TMDB_DISCOVER_MOVIE+"&sort_by=vote_average.desc");
+        switch (sort_order) {
+            case "most_popular":
+                fetchData.execute(Constants.TMDB_DISCOVER_MOVIE + "&sort_by=popularity.desc");
+                break;
+            case "highest_rated":
+                fetchData.execute(Constants.TMDB_DISCOVER_MOVIE + "&sort_by=vote_average.desc");
+                break;
+            default:
+                ((AppCompatActivity) getActivity())
+                        .getSupportLoaderManager().initLoader(FAVOURITE_LOADER_ID, null, MovieListFragment.this);
+                break;
+        }
     }
 
     @Override
@@ -134,6 +164,10 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         }
         //store current sort order
         outState.putString(KEY_SORT_ORDER,mSort_order);
+        //store current selected movie position
+        outState.putInt(KEY_SELECTED_MOVIE_POSITION,mSelectedMoviePosition);
+        //store current scroll position
+        outState.putInt(KEY_GRIDVIEW_SCROLL_POSITION,mMovieListGridView.getFirstVisiblePosition());
         super.onSaveInstanceState(outState);
     }
 
@@ -156,8 +190,48 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        mSelectedMoviePosition=position;
         Movies movies= (Movies) mMovieListGridView.getItemAtPosition(position);
         mListener.onMovieItemClick(movies);
+    }
+
+    /**
+     * setup loader to load and display offline fav movie list
+     * @param id loader id
+     * @param args loader argument
+     * @return
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), MoviesProvider.FavouriteMovieDetail.CONTENT_URI,null
+                    ,null,null,null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mMovieListAdapter.clear();
+        ArrayList<Movies> moviesArrayList=new ArrayList<>();
+        if(data.moveToFirst()) {
+            do {
+                Movies movies = new Movies();
+                movies.setId(data.getString(data.getColumnIndex(FavouriteMovieDetail.MOVIE_ID)));
+                movies.setTitle(data.getString(data.getColumnIndex(FavouriteMovieDetail.MOVIE_TITLE)));
+                movies.setOverview(data.getString(data.getColumnIndex(FavouriteMovieDetail.MOVIE_OVERVIEW)));
+                movies.setPoster_path(data.getString(data.getColumnIndex(FavouriteMovieDetail.POSTER_PATH)));
+                movies.setRelease_date(data.getString(data.getColumnIndex(FavouriteMovieDetail.MOVIE_RELEASE_DATE)));
+                movies.setVote_average(data.getString(data.getColumnIndex(FavouriteMovieDetail.MOVIE_VOTE_AVERAGE)));
+                moviesArrayList.add(movies);
+            } while (data.moveToNext());
+        }
+        mMovieListAdapter.addAll(moviesArrayList);
+
+        if(mProgressBar!=null)
+            mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d(TAG,"loader reset ");
     }
 
     /**
@@ -175,7 +249,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         @Override
         protected ArrayList<Movies> doInBackground(String... Url) {
             //download url
-            String response =downloadUrl(Url[0]);
+            String response =mUtility.downloadUrl(Url[0]);
             if(response!=null) {
                 try {
                     //parse tmdb json
@@ -185,7 +259,6 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
                     return null;
                 }
             } else {
-                Toast.makeText(getActivity(), R.string.network_error_msg,Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -194,9 +267,12 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         protected void onPostExecute(ArrayList<Movies> movieList) {
             super.onPostExecute(movieList);
             if(movieList!=null) {
-                //add and notify adapter
+                //add and notify adapter s
                 mMovieListAdapter.addAll(movieList);
+                //display coach mark in tablet mode
+
             } else {
+                Toast.makeText(getActivity(), R.string.network_error_msg,Toast.LENGTH_SHORT).show();
                 Log.d(TAG,"no movie list found");
             }
             if(mProgressBar!=null)
@@ -212,6 +288,7 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject movieClass = jsonArray.getJSONObject(i);
             Movies movies = new Movies();
+            movies.setId(movieClass.getString("id"));
             movies.setTitle(movieClass.getString("original_title"));
             movies.setOverview(movieClass.getString("overview"));
             movies.setPoster_path(movieClass.getString("poster_path"));
@@ -221,60 +298,4 @@ public class MovieListFragment extends Fragment implements AdapterView.OnItemCli
         }
         return moviesArrayList;
     }
-
-    /**
-     * download url
-     */
-    private String downloadUrl(String tmdb_url) {
-        InputStream inputStream=null;
-        try {
-            URL url=new URL(tmdb_url);
-            HttpURLConnection httpURLConnection= (HttpURLConnection) url.openConnection();
-            httpURLConnection.setReadTimeout(10000);
-            httpURLConnection.setConnectTimeout(15000);
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setDoInput(true);
-            httpURLConnection.connect();
-            //check status code
-            int responseCode=httpURLConnection.getResponseCode();
-            if(responseCode==HttpURLConnection.HTTP_OK) {
-                inputStream=httpURLConnection.getInputStream();
-                //pares input stream
-                return readIt(inputStream);
-            } else {
-                Log.d(TAG,responseCode+"");
-                return null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if(inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-    }
-
-    /**
-     * convert input stream to string
-     * @param inputStream inputStream
-     */
-    private String readIt(InputStream inputStream) {
-        InputStreamReader reader=new InputStreamReader(inputStream);
-        BufferedReader bufferedReader=new BufferedReader(reader);
-        StringBuilder builder=new StringBuilder();
-        String thisLine="";
-        try {
-            while((thisLine=bufferedReader.readLine())!=null){
-                builder.append(thisLine+"\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return builder.toString();
-    }
-
 }

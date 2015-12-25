@@ -57,9 +57,16 @@ public class SettingsFragment extends PreferenceFragment implements
         Preference moviePref = findPreference(key);
         // Set summary to be the user-description for the selected value
         String values=sharedPreferences.getString(key, "");
-        if(values.equals("most_popular"))
-            moviePref.setSummary("Most Popular");
-        else
-            moviePref.setSummary("Highest Rated");
+        switch (values) {
+            case "most_popular":
+                moviePref.setSummary("Most Popular");
+                break;
+            case "highest_rated":
+                moviePref.setSummary("Highest Rated");
+                break;
+            default:
+                moviePref.setSummary("Favourite");
+                break;
+        }
     }
 }

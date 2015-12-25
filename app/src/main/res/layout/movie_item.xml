@@ -9,5 +9,12 @@
         android:adjustViewBounds="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/movie_selection"
         android:contentDescription="@string/content_descr_movie_poster" />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/movie_selection"
+        />
 </FrameLayout>

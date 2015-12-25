@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/movie_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:padding="@dimen/tv_movie_title_padding"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/movie_title_text_size" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingLeft="@dimen/detail_screen_padding"
+        android:paddingRight="@dimen/detail_screen_padding"
+        android:paddingBottom="@dimen/detail_screen_padding">
+
+        <ImageView
+            android:id="@+id/iv_thumb_movie_poster"
+            android:layout_width="@dimen/poster_thumb_width"
+            android:layout_height="@dimen/poster_thumb_height"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/tv_movie_plot"
+            android:layout_alignTop="@+id/iv_thumb_movie_poster"
+            android:layout_toEndOf="@+id/iv_thumb_movie_poster"
+            android:layout_toRightOf="@+id/iv_thumb_movie_poster"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tv_release_date"
+                style="@style/TitleTextStyle"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/tv_movie_rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@android:color/secondary_text_light" />
+            <Button
+                android:enabled="false"
+                android:layout_margin="10dp"
+                android:padding="5dp"
+                android:textColor="@android:color/white"
+                android:background="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/favorite_movie"
+                />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_movie_plot"
+            style="@style/TitleTextStyle"
+            android:layout_below="@id/iv_thumb_movie_poster"
+            android:textAppearance="?android:textAppearanceMedium" />
+    </RelativeLayout>
+</LinearLayout>
